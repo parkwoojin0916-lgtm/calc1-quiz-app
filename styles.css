@@ -176,6 +176,12 @@ body {
   color: var(--blue-900);
 }
 
+.deploy-test {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue-500);
+}
+
 .problem-index {
   font-size: 13px;
   color: var(--ink-soft);
