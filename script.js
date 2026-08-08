@@ -1,22 +1,78 @@
-// ---------- 난이도 선택 ----------
+// ---------- 다크모드 ----------
+const themeButton = document.getElementById("themeButton");
+const THEME_KEY = "mathpad_theme";
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeButton.textContent = theme === "dark" ? "◑" : "◐";
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+themeButton.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  applyTheme(next);
+});
+
+applyTheme(localStorage.getItem(THEME_KEY) || "light");
+
+// ---------- 오늘의 학습 통계 ----------
+const statSolved = document.getElementById("statSolved");
+const statCorrect = document.getElementById("statCorrect");
+const statAccuracy = document.getElementById("statAccuracy");
+const STATS_KEY = "mathpad_stats";
+
+function loadStats() {
+  try {
+    return JSON.parse(localStorage.getItem(STATS_KEY)) || { solved: 0, correct: 0 };
+  } catch {
+    return { solved: 0, correct: 0 };
+  }
+}
+
+function renderStats() {
+  const { solved, correct } = loadStats();
+  const accuracy = solved === 0 ? 0 : Math.round((correct / solved) * 100);
+  statSolved.textContent = solved;
+  statCorrect.textContent = correct;
+  statAccuracy.textContent = `${accuracy}%`;
+}
+
+renderStats();
+
+// ---------- 출제 설정 (개념 / 난이도) ----------
 const diffButtons = document.querySelectorAll(".diff-btn");
+const conceptSelect = document.getElementById("conceptSelect");
+const problemMeta = document.getElementById("problemMeta");
+
+function updateProblemMeta() {
+  const conceptLabel = conceptSelect.options[conceptSelect.selectedIndex].text;
+  const activeDiff = document.querySelector(".diff-btn.active");
+  const diffLabel = activeDiff ? activeDiff.dataset.label : "난이도 미선택";
+  problemMeta.textContent = `${conceptLabel} · ${diffLabel}`;
+}
+
 diffButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     diffButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
+    updateProblemMeta();
   });
 });
 
-// ---------- 개념 선택 ----------
-const conceptSelect = document.getElementById("conceptSelect");
-conceptSelect.addEventListener("change", () => {
-  // 문제 데이터 연동 시 여기서 필터링 처리
-});
+conceptSelect.addEventListener("change", updateProblemMeta);
 
-// ---------- 정답 확인 / 다음 문제 / 비슷한 문제 (문제 데이터 연동 전 placeholder) ----------
+updateProblemMeta();
+
+// ---------- 정답 확인 / 다음 문제 / 건너뛰기 / 풀이 보기 / 저장 / 비슷한 문제 ----------
+// 문제 데이터가 아직 없어서 아래 버튼들은 안내 문구만 보여주는 상태이며,
+// 실제 문제/정답 데이터가 연결되면 이 부분에서 채점·통계 갱신 로직을 채워 넣는다.
 const checkAnswerBtn = document.getElementById("checkAnswerBtn");
 const nextBtn = document.getElementById("nextBtn");
+const skipBtn = document.getElementById("skipBtn");
+const saveBtn = document.getElementById("saveBtn");
 const similarBtn = document.getElementById("similarBtn");
+const solutionBtn = document.getElementById("solutionBtn");
+const solutionPanel = document.getElementById("solutionPanel");
 const feedback = document.getElementById("feedback");
 
 checkAnswerBtn.addEventListener("click", () => {
@@ -26,10 +82,25 @@ checkAnswerBtn.addEventListener("click", () => {
 
 nextBtn.addEventListener("click", () => {
   feedback.textContent = "";
+  solutionPanel.classList.add("hidden");
+});
+
+skipBtn.addEventListener("click", () => {
+  feedback.textContent = "";
+  solutionPanel.classList.add("hidden");
+});
+
+saveBtn.addEventListener("click", () => {
+  feedback.textContent = "저장 기능은 문제 데이터가 연결되면 사용할 수 있습니다.";
+  feedback.className = "feedback";
 });
 
 similarBtn.addEventListener("click", () => {
   feedback.textContent = "";
+});
+
+solutionBtn.addEventListener("click", () => {
+  solutionPanel.classList.toggle("hidden");
 });
 
 // ---------- 노트 캔버스 (손글씨/펜) ----------
@@ -148,7 +219,10 @@ function eraseAt(pos) {
   return false;
 }
 
+let penOnlyMode = false;
+
 function startDraw(e) {
+  if (penOnlyMode && e.pointerType !== "pen") return;
   drawing = true;
   erasedSomething = false;
   canvas.setPointerCapture(e.pointerId);
@@ -237,6 +311,16 @@ document.addEventListener("pointerdown", (e) => {
   if (!penToolWrap.contains(e.target)) {
     closePopover();
   }
+});
+
+// ---------- 펜 전용 모드 (손바닥 터치로 인한 오작동 방지) ----------
+const penOnlyBtn = document.getElementById("penOnlyBtn");
+const penOnlyLabel = document.getElementById("penOnlyLabel");
+
+penOnlyBtn.addEventListener("click", () => {
+  penOnlyMode = !penOnlyMode;
+  penOnlyBtn.classList.toggle("active", penOnlyMode);
+  penOnlyLabel.textContent = penOnlyMode ? "펜 전용 켜짐" : "펜 전용 꺼짐";
 });
 
 // ---------- 펜 색상 ----------
