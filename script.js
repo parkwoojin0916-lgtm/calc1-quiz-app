@@ -80,6 +80,13 @@ checkAnswerBtn.addEventListener("click", () => {
   feedback.className = "feedback";
 });
 
+const answerInput = document.getElementById("answerInput");
+answerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !checkAnswerBtn.disabled) {
+    checkAnswerBtn.click();
+  }
+});
+
 nextBtn.addEventListener("click", () => {
   feedback.textContent = "";
   solutionPanel.classList.add("hidden");
@@ -282,10 +289,6 @@ function setToolMode(mode) {
   penBtn.classList.toggle("active", mode === "pen");
   eraserBtn.classList.toggle("active", mode === "eraser");
   canvas.style.cursor = mode === "eraser" ? "cell" : "crosshair";
-}
-
-function openPopover() {
-  penPopover.classList.add("open");
 }
 
 function closePopover() {

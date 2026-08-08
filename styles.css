@@ -374,10 +374,14 @@ body {
 .feedback.incorrect { color: var(--danger); }
 
 .secondary-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  flex-wrap: wrap;
   padding-bottom: 18px;
+}
+
+.btn-icon {
+  margin-right: 6px;
 }
 
 /* ---------- 해설 ---------- */
