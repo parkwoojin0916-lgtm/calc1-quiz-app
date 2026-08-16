@@ -55,17 +55,12 @@ diffButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     diffButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
-    updateProblemMeta();
   });
 });
-
-conceptSelect.addEventListener("change", updateProblemMeta);
 
 updateProblemMeta();
 
 // ---------- 정답 확인 / 다음 문제 / 건너뛰기 / 풀이 보기 / 저장 / 비슷한 문제 ----------
-// 문제 데이터가 아직 없어서 아래 버튼들은 안내 문구만 보여주는 상태이며,
-// 실제 문제/정답 데이터가 연결되면 이 부분에서 채점·통계 갱신 로직을 채워 넣는다.
 const checkAnswerBtn = document.getElementById("checkAnswerBtn");
 const nextBtn = document.getElementById("nextBtn");
 const skipBtn = document.getElementById("skipBtn");
@@ -74,13 +69,105 @@ const similarBtn = document.getElementById("similarBtn");
 const solutionBtn = document.getElementById("solutionBtn");
 const solutionPanel = document.getElementById("solutionPanel");
 const feedback = document.getElementById("feedback");
+const answerInput = document.getElementById("answerInput");
+const problemIndexLabel = document.getElementById("problemIndex");
+const problemDisplay = document.getElementById("problemDisplay");
+
+const actionButtons = [checkAnswerBtn, nextBtn, skipBtn, saveBtn, similarBtn, solutionBtn, answerInput];
+
+const SAVED_KEY = "mathpad_saved";
+
+let problemPool = [];
+let problemQueue = [];
+let queuePointer = 0;
+let currentProblem = null;
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getActiveDifficulty() {
+  const activeDiff = document.querySelector(".diff-btn.active");
+  return activeDiff ? activeDiff.dataset.level : null;
+}
+
+function rebuildPool() {
+  const concept = conceptSelect.value;
+  const difficulty = getActiveDifficulty();
+  problemPool = PROBLEMS.filter(
+    (p) => (!concept || p.concept === concept) && (!difficulty || p.difficulty === difficulty)
+  );
+  problemQueue = shuffle(problemPool);
+  queuePointer = 0;
+}
+
+function setActionButtonsDisabled(disabled) {
+  actionButtons.forEach((btn) => { btn.disabled = disabled; });
+}
+
+function normalizeAnswer(str) {
+  return String(str)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/<=/g, "≤")
+    .replace(/>=/g, "≥");
+}
+
+function loadNextFromQueue() {
+  if (problemPool.length === 0) {
+    currentProblem = null;
+    problemDisplay.innerHTML = '<p class="placeholder-text">선택한 개념·난이도에 맞는 문제가 아직 없습니다.<br>다른 조건을 선택해보세요.</p>';
+    problemIndexLabel.textContent = "문제 없음";
+    setActionButtonsDisabled(true);
+    return;
+  }
+  if (queuePointer >= problemQueue.length) {
+    problemQueue = shuffle(problemPool);
+    queuePointer = 0;
+  }
+  currentProblem = problemQueue[queuePointer];
+  queuePointer++;
+  renderProblem();
+}
+
+function renderProblem() {
+  answered = false;
+  feedback.textContent = "";
+  feedback.className = "feedback";
+  solutionPanel.classList.add("hidden");
+  answerInput.value = "";
+  setActionButtonsDisabled(false);
+
+  const p = currentProblem;
+  problemDisplay.innerHTML = `<p class="problem-text">${p.question.replace(/\n/g, "<br>")}</p>`;
+  problemIndexLabel.textContent = `${p.tier} · ${queuePointer}/${problemQueue.length}`;
+  updateProblemMeta();
+}
+
+function updateStats(isCorrect) {
+  const stats = loadStats();
+  stats.solved += 1;
+  if (isCorrect) stats.correct += 1;
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  renderStats();
+}
 
 checkAnswerBtn.addEventListener("click", () => {
-  feedback.textContent = "문제 데이터가 연결되면 채점이 가능합니다.";
-  feedback.className = "feedback";
+  if (!currentProblem || answered) return;
+  const isCorrect = normalizeAnswer(answerInput.value) === normalizeAnswer(currentProblem.answer);
+  feedback.textContent = isCorrect ? "정답입니다!" : `오답입니다. (정답: ${currentProblem.answer})`;
+  feedback.className = `feedback ${isCorrect ? "correct" : "incorrect"}`;
+  answered = true;
+  updateStats(isCorrect);
 });
 
-const answerInput = document.getElementById("answerInput");
 answerInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !checkAnswerBtn.disabled) {
     checkAnswerBtn.click();
@@ -88,27 +175,66 @@ answerInput.addEventListener("keydown", (e) => {
 });
 
 nextBtn.addEventListener("click", () => {
-  feedback.textContent = "";
-  solutionPanel.classList.add("hidden");
+  loadNextFromQueue();
 });
 
 skipBtn.addEventListener("click", () => {
-  feedback.textContent = "";
-  solutionPanel.classList.add("hidden");
+  loadNextFromQueue();
 });
 
 saveBtn.addEventListener("click", () => {
-  feedback.textContent = "저장 기능은 문제 데이터가 연결되면 사용할 수 있습니다.";
+  if (!currentProblem) return;
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem(SAVED_KEY)) || [];
+  } catch {
+    saved = [];
+  }
+  if (!saved.includes(currentProblem.id)) {
+    saved.push(currentProblem.id);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+    feedback.textContent = "이 문제를 저장했습니다.";
+  } else {
+    feedback.textContent = "이미 저장한 문제입니다.";
+  }
   feedback.className = "feedback";
 });
 
 similarBtn.addEventListener("click", () => {
-  feedback.textContent = "";
+  if (!currentProblem) return;
+  const candidates = problemPool.filter(
+    (p) => p.tier === currentProblem.tier && p.id !== currentProblem.id
+  );
+  if (candidates.length === 0) {
+    feedback.textContent = "비슷한 문제를 더 찾지 못했습니다.";
+    feedback.className = "feedback";
+    return;
+  }
+  currentProblem = candidates[Math.floor(Math.random() * candidates.length)];
+  renderProblem();
 });
 
 solutionBtn.addEventListener("click", () => {
+  if (!currentProblem) return;
+  solutionPanel.innerHTML = `<h3>해설</h3><p class="placeholder-text">${currentProblem.explanation}</p>`;
   solutionPanel.classList.toggle("hidden");
 });
+
+diffButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    rebuildPool();
+    loadNextFromQueue();
+  });
+});
+
+conceptSelect.addEventListener("change", () => {
+  rebuildPool();
+  loadNextFromQueue();
+});
+
+setActionButtonsDisabled(true);
+rebuildPool();
+loadNextFromQueue();
 
 // ---------- 노트 캔버스 (손글씨/펜) ----------
 const canvas = document.getElementById("noteCanvas");
