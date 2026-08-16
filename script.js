@@ -77,6 +77,16 @@ const actionButtons = [checkAnswerBtn, nextBtn, skipBtn, saveBtn, similarBtn, so
 
 const SAVED_KEY = "mathpad_saved";
 
+// 문제/해설 안의 \( ... \) 로 감싼 수식을 KaTeX로 렌더링한다.
+function renderMath(el) {
+  if (window.renderMathInElement) {
+    window.renderMathInElement(el, {
+      delimiters: [{ left: "\\(", right: "\\)", display: false }],
+      throwOnError: false,
+    });
+  }
+}
+
 let problemPool = [];
 let problemQueue = [];
 let queuePointer = 0;
@@ -147,6 +157,7 @@ function renderProblem() {
 
   const p = currentProblem;
   problemDisplay.innerHTML = `<p class="problem-text">${p.question.replace(/\n/g, "<br>")}</p>`;
+  renderMath(problemDisplay);
   problemIndexLabel.textContent = `${p.tier} · ${queuePointer}/${problemQueue.length}`;
   updateProblemMeta();
 }
@@ -217,6 +228,7 @@ similarBtn.addEventListener("click", () => {
 solutionBtn.addEventListener("click", () => {
   if (!currentProblem) return;
   solutionPanel.innerHTML = `<h3>해설</h3><p class="placeholder-text">${currentProblem.explanation}</p>`;
+  renderMath(solutionPanel);
   solutionPanel.classList.toggle("hidden");
 });
 
