@@ -53,6 +53,15 @@ npm run build    # dist/ 에 배포용 파일 생성
 
 > 시공 사례 이미지는 현재 일러스트입니다. 실제 시공 사진으로 바꾸는 것을 추천드려요.
 
+## 첫 방문 로고 인트로
+
+- 처음 들어오면 로고가 유리 렌즈 속에서 나타난 뒤 홈페이지가 열립니다 (같은 탭에서는 한 번만).
+- 화면 클릭 · Esc · "건너뛰기"로 바로 넘어가고, 동작 줄이기 설정이나 WebGL2 미지원 기기는 간단한 페이드로 대체됩니다.
+- 다시 보기: 주소 뒤에 `?intro` · 끄기: `?nointro` · 특정 시점에 멈춰 보기(개발용): `?introAt=1.5`
+- 코드: `src/intro.js` (색 · 크기 · 속도 설정), `src/components/ui/liquid-glass-logo-reveal.ts` (애니메이션 엔진)
+- 엔진은 21st.dev의 React 컴포넌트(원본 셰이더: zanwei/glass-icon-reveal, MIT)를 이 사이트에 맞게 React 없이 쓰도록 옮긴 것입니다.
+  `npm run typecheck`로 TypeScript 검사를 할 수 있습니다.
+
 ## 배포 (Cloudflare Pages)
 
 - 주소: https://chakhan-interior.pages.dev (Cloudflare Pages 프로젝트 `chakhan-interior`, 직접 업로드 방식)

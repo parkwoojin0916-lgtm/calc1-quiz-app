@@ -2,6 +2,7 @@ import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './style.css';
 import { SITE, PLACEHOLDER_RESERVATION, SERVICES, TICKER, BRANDS, PRICE_ITEMS, PILLARS, WALLS, FLOORS, CASES, STEPS, METRICS, FAQ, QUOTE_OPTIONS } from './data.js';
 import { ICONS } from './scene.js';
+import { runIntro } from './intro.js';
 
 const { phone: PHONE } = SITE;
 const TEL = `tel:${PHONE.replace(/-/g, '')}`;
@@ -451,17 +452,20 @@ async function copyText(text) {
 function scrollToEl(el) { el?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); }
 const preload = (src) => new Promise((res) => { const i = new Image(); i.onload = i.onerror = () => res(i); i.src = src; });
 
-// ── 등장 애니메이션 ─────────────────────────────────────────
+// ── 등장 애니메이션 (첫 방문 시 로고 인트로가 끝난 뒤 시작) ─────────
 document.documentElement.classList.add('js');
-requestAnimationFrame(() => document.body.classList.add('loaded'));
-if ('IntersectionObserver' in window) {
-  const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-  }), { rootMargin: '0px 0px -8% 0px', threshold: 0 });
-  $$('.reveal').forEach((el) => io.observe(el));
-} else {
-  $$('.reveal').forEach((el) => el.classList.add('in'));
+function startReveals() {
+  document.body.classList.add('loaded');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    $$('.reveal').forEach((el) => io.observe(el));
+  } else {
+    $$('.reveal').forEach((el) => el.classList.add('in'));
+  }
 }
+runIntro(() => requestAnimationFrame(startReveals));
 
 // ── 헤더 · 진행바 · 스크롤스파이 · 맨 위로 ────────────────────
 const progress = $('.progress span');

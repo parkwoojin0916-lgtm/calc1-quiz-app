@@ -603,6 +603,21 @@ input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px 
   .mobile-cta a:nth-child(2) { background: var(--red); color: #fff; }
 }
 
+/* ── 첫 방문 로고 인트로 ─────────────────────────────── */
+html.splash-active, html.splash-active body { overflow: hidden; }
+.splash { --tile: min(300px, 57.1vmin); position: fixed; inset: 0; z-index: 200; background: var(--bg); cursor: pointer; transition: opacity .8s var(--ease), visibility 0s .8s; }
+.splash.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-stage { position: absolute; inset: 0; }
+.splash-word { position: absolute; left: 50%; top: calc(50% + var(--tile) * .36 + 6px); display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; transform: translate(-50%, 12px); transition: opacity 1s var(--ease-out), transform 1s var(--ease-out); pointer-events: none; white-space: nowrap; }
+.splash.show-word .splash-word { opacity: 1; transform: translate(-50%, 0); }
+.splash-word strong { font-size: clamp(24px, 3vw, 34px); font-weight: 600; letter-spacing: -.045em; color: var(--ink); }
+.splash-word span { padding-left: .55em; font-size: 11px; letter-spacing: .55em; color: var(--sand); }
+.splash-skip { position: absolute; right: max(20px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); padding: 10px 18px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 13px; color: var(--muted); background: rgba(243, 238, 228, .04); transition: color .2s, border-color .2s; }
+.splash-skip:hover { color: var(--ink); border-color: var(--ink); }
+.splash.is-fallback .splash-stage { display: grid; place-items: center; }
+.splash-fallback { width: min(40vw, 220px); height: auto; opacity: 0; transform: scale(.94); animation: splashFade 1s var(--ease-out) .1s forwards; }
+@keyframes splashFade { to { opacity: 1; transform: none; } }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; }
