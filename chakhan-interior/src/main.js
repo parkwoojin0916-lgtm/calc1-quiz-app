@@ -54,8 +54,8 @@ app.innerHTML = `
 
 <header class="site-header">
   <a class="brand" href="#top" aria-label="${SITE.name} 홈">
-    <span class="brand-mark"><img src="/assets/logo-mark-160.png" width="44" height="44" alt="" /></span>
-    <span class="brand-name"><strong>착한</strong><span>도배·장판 인테리어 <em>청주점</em></span></span>
+    <span class="brand-mark"><img src="/assets/brand/mark.png" width="257" height="160" alt="" /></span>
+    <span class="brand-name"><strong>착한 인테리어</strong><span>도배 · 장판 · 마루 · 필름 <em>청주점</em></span></span>
   </a>
   <nav class="nav" id="site-nav" aria-label="주요 메뉴">
     <a href="#services">서비스</a>
@@ -99,7 +99,7 @@ app.innerHTML = `
     <figure class="hero-media reveal reveal-d1">
       <div class="hero-photo"><img src="/assets/hero.webp" width="1100" height="1375" alt="헤링본 마루와 그레이지 실크 벽지로 마감한 밝은 거실 (AI 예시 이미지)" fetchpriority="high" /></div>
       <figcaption class="hero-card">
-        <span class="hero-card-logo"><img src="/assets/logo-mark-160.png" width="44" height="44" alt="" /></span>
+        <span class="hero-card-logo"><img src="/assets/brand/mark.png" width="257" height="160" alt="" /></span>
         <span><strong>그레이지 실크 · 헤링본</strong><small>분위기 미리보기에서 직접 바꿔보세요</small></span>
         <a href="#studio" aria-label="분위기 미리보기로 이동">${ICONS.right}</a>
       </figcaption>
@@ -403,7 +403,7 @@ app.innerHTML = `
 <footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-brand">
-      <span class="brand-mark"><img src="/assets/logo-mark-160.png" width="44" height="44" alt="" loading="lazy" /></span>
+      <div class="footer-lockup"><img src="/assets/brand/mark.png" width="257" height="160" alt="" loading="lazy" /><span><b>착한 인테리어</b><small>INTERIOR DESIGN</small></span></div>
       <div><strong>${SITE.name}</strong><p>소통으로 만들어지는 아름다운 생활공간</p></div>
     </div>
     <ul class="footer-info">
