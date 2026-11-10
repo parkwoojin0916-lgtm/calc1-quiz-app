@@ -37,3 +37,11 @@ npm run build    # dist/ 에 배포용 파일 생성
 - 모바일 하단 고정 바: 전화 / 견적 문의 / 예약
 
 > 시공 사례 이미지는 현재 일러스트입니다. 실제 시공 사진으로 바꾸는 것을 추천드려요.
+
+## 배포 (Cloudflare Pages)
+
+- 주소: https://chakhan-interior.pages.dev (Cloudflare Pages 프로젝트 `chakhan-interior`, 직접 업로드 방식)
+- 다시 배포하기: `npm run build` 후 `npx wrangler pages deploy dist --project-name chakhan-interior`
+- 도메인 연결: Cloudflare 대시보드 → Workers & Pages → chakhan-interior → Custom domains
+- GitHub 자동 배포를 원하면 GitHub 업로드 후 Cloudflare에서 Git 연동 프로젝트로 다시 만들면 됩니다
+  (빌드 명령 `npm run build`, 출력 폴더 `dist`, 루트 폴더 `chakhan-interior`)
