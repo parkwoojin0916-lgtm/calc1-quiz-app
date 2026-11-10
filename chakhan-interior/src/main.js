@@ -1,18 +1,20 @@
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './style.css';
 import { SITE, PLACEHOLDER_RESERVATION, SERVICES, TICKER, PILLARS, WALLS, FLOORS, CASES, STEPS, METRICS, FAQ, QUOTE_OPTIONS } from './data.js';
-import { ICONS, roomSVG } from './scene.js';
+import { ICONS } from './scene.js';
 
 const { phone: PHONE } = SITE;
 const TEL = `tel:${PHONE.replace(/-/g, '')}`;
 const RES = SITE.reservationUrl;
-const NAVER_MAP = `https://map.naver.com/p/search/${encodeURIComponent(SITE.address.replace(', 1층', ''))}`;
-const KAKAO_MAP = `https://map.kakao.com/link/search/${encodeURIComponent(SITE.address.replace(', 1층', ''))}`;
+const MAP_Q = encodeURIComponent(SITE.address.replace(', 1층', ''));
+const NAVER_MAP = `https://map.naver.com/p/search/${MAP_Q}`;
+const KAKAO_MAP = `https://map.kakao.com/link/search/${MAP_Q}`;
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const isTouch = window.matchMedia('(pointer: coarse)').matches;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const roomSrc = (floor, wall) => `/assets/rooms/room-${floor}-${wall}.webp`;
 
 const store = {
   get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
@@ -31,18 +33,17 @@ const state = {
   contact: typeof saved.contact === 'string' ? saved.contact : '',
   memo: typeof saved.memo === 'string' ? saved.memo : '',
   mood: null,
-  viz: { wall: WALLS[2].id, floor: FLOORS[0].id, light: 'day', accent: false }
+  viz: { wall: 'greige', floor: 'herring', light: 'day' }
 };
 
 // ── 마크업 ──────────────────────────────────────────────────
 const btn = (cls, href, label, icon = ICONS.arrow, attrs = '') => `<a class="btn ${cls}" href="${href}" ${attrs}><span class="btn-label">${label}</span><span class="btn-icon">${icon}</span></a>`;
-const kicker = (num, text) => `<p class="kicker"><span class="kicker-num">${num}</span><span class="kicker-line"></span>${text}</p>`;
+const kicker = (num, en, ko) => `<p class="kicker reveal"><span class="kicker-num">${num}</span><span class="kicker-en">${en}</span><span class="kicker-ko">${ko}</span></p>`;
 
 const app = document.querySelector('#app');
 app.innerHTML = `
 <a class="skip-link" href="#main">본문 바로가기</a>
 <div class="progress" aria-hidden="true"><span></span></div>
-<div class="grain" aria-hidden="true"></div>
 
 <header class="site-header">
   <a class="brand" href="#top" aria-label="${SITE.name} 홈">
@@ -52,16 +53,16 @@ app.innerHTML = `
   <nav class="nav" id="site-nav" aria-label="주요 메뉴">
     <a href="#services">서비스</a>
     <a href="#studio">분위기 미리보기</a>
-    <a href="#portfolio">현장 기록</a>
+    <a href="#portfolio">시공 전후</a>
     <a href="#process">진행 방식</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">오시는 길</a>
     <div class="nav-mobile-extra">
-      <a class="btn btn-primary" href="${TEL}"><span class="btn-label">${PHONE}</span><span class="btn-icon">${ICONS.phone}</span></a>
+      <a class="btn btn-light" href="${TEL}"><span class="btn-label">${PHONE}</span><span class="btn-icon">${ICONS.phone}</span></a>
     </div>
   </nav>
   <div class="header-actions">
-    <a class="header-call" href="${TEL}"><span class="live-dot"></span>${PHONE}</a>
+    <a class="header-call" href="${TEL}">${ICONS.phone}<span>${PHONE}</span></a>
     <a class="header-quote" href="#quote">견적 문의 <span class="quote-badge" data-count-badge hidden>0</span></a>
     <button class="menu-toggle" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="site-nav"><span></span><span></span></button>
   </div>
@@ -69,53 +70,45 @@ app.innerHTML = `
 
 <main id="main">
   <section class="hero" id="top" data-section>
-    <div class="hero-spot" aria-hidden="true"></div>
-    <div class="hero-grid-lines" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="hero-copy">
-      <p class="eyebrow reveal"><span class="live-dot"></span>청주 · 오창 · 오송 · 세종 무료 방문 견적</p>
+      <p class="eyebrow reveal"><span class="dot"></span>청주 · 오창 · 오송 · 세종 무료 방문 견적</p>
       <h1 class="hero-title">
         <span class="line"><span>집의 분위기를</span></span>
         <span class="line"><span><em>바꾸는 건</em>,</span></span>
-        <span class="line"><span class="dim">마감의 정밀도</span>입니다.</span>
+        <span class="line"><span><span class="dim">마감의 정밀도</span><wbr />입니다.</span></span>
       </h1>
       <p class="hero-lede reveal reveal-d2">청주 전 지역 도배·장판·마루·부분 인테리어. <br />대표가 직접 상담하고, 처음부터 마감 확인까지 꼼꼼하게 관리합니다.</p>
       <div class="hero-actions reveal reveal-d3">
-        ${btn('btn-primary magnetic', TEL, '전화 상담', ICONS.phone)}
-        ${btn('btn-ghost magnetic', '#quote', '30초 견적 문의', ICONS.right)}
+        ${btn('btn-light', TEL, '전화 상담', ICONS.phone)}
+        ${btn('btn-ghost', '#quote', '30초 견적 문의', ICONS.right)}
       </div>
-      <ul class="hero-trust reveal reveal-d4" aria-label="서비스 특징">
-        <li><b>무료</b><span>방문 견적</span></li>
-        <li><b>대표 직접</b><span>상담 · 시공 관리</span></li>
-        <li><b>13+</b><span>마감 공정 대응</span></li>
-      </ul>
+      <dl class="hero-stats reveal reveal-d4">
+        <div><dt>무료</dt><dd>방문 견적</dd></div>
+        <div><dt>대표 직접</dt><dd>상담 · 시공 관리</dd></div>
+        <div><dt>13<sup>+</sup></dt><dd>마감 공정 대응</dd></div>
+      </dl>
     </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="stage">
-        <div class="orbital orbital-a"></div>
-        <div class="orbital orbital-b"></div>
-        <div class="orbital orbital-c"></div>
-        <div class="pedestal tilt">
-          <div class="pedestal-glow"></div>
-          <img src="/assets/logo-mark-960.webp" width="960" height="960" alt="" fetchpriority="high" />
-          <span class="logo-shine"></span>
-        </div>
-        <div class="float-chip chip-a"><span>WALL</span><b>실크 · 합지</b></div>
-        <div class="float-chip chip-b"><span>FLOOR</span><b>장판 · 강마루</b></div>
-        <div class="float-chip chip-c"><span>FINISH</span><b>필름 · 목공</b></div>
-      </div>
-      <div class="visual-caption"><span>MARK / 001</span><strong>정확한 상담, 선명한 결과</strong></div>
-    </div>
-    <a class="scroll-cue" href="#intro" aria-label="아래로 스크롤"><span class="scroll-mouse"><span></span></span>SCROLL</a>
+    <figure class="hero-media reveal reveal-d1">
+      <div class="hero-photo"><img src="/assets/hero.webp" width="1100" height="1375" alt="헤링본 마루와 그레이지 실크 벽지로 마감한 밝은 거실 (AI 예시 이미지)" fetchpriority="high" /></div>
+      <figcaption class="hero-card">
+        <span class="hero-card-logo"><img src="/assets/logo-mark-160.png" width="44" height="44" alt="" /></span>
+        <span><strong>그레이지 실크 · 헤링본</strong><small>분위기 미리보기에서 직접 바꿔보세요</small></span>
+        <a href="#studio" aria-label="분위기 미리보기로 이동">${ICONS.right}</a>
+      </figcaption>
+      <span class="hero-tag">AI 예시 이미지</span>
+    </figure>
   </section>
 
-  <section class="ticker" aria-label="시공 가능 항목">
-    <div class="ticker-row"><div class="ticker-track">${[...TICKER, ...TICKER].map((t) => `<span>${t}</span><b>✳</b>`).join('')}</div></div>
-    <div class="ticker-row reverse" aria-hidden="true"><div class="ticker-track">${[...TICKER, ...TICKER].reverse().map((t) => `<span>${t}</span><i></i>`).join('')}</div></div>
+  <section class="scope" aria-label="시공 가능 항목">
+    <div class="wrap scope-inner">
+      <p class="scope-label"><span>${TICKER.length}</span>가지 시공 범위</p>
+      <ul class="scope-list">${TICKER.map((t) => `<li>${t}</li>`).join('')}</ul>
+    </div>
   </section>
 
   <section class="intro section" id="intro">
     <div class="wrap">
-      ${kicker('01', 'WHY CHAKHAN')}
+      ${kicker('01', 'Why Chakhan', '착한 인테리어')}
       <div class="intro-grid">
         <h2 class="reveal">좋은 공간은<br /><span class="dim">보이는 것보다</span><br />더 많은 걸 바꿉니다.</h2>
         <div class="intro-body reveal reveal-d1">
@@ -132,13 +125,12 @@ app.innerHTML = `
   <section class="services section" id="services" data-section>
     <div class="wrap">
       <div class="section-head">
-        <div>${kicker('02', 'CAPABILITIES')}<h2 class="reveal">필요한 만큼,<br />정확하게.</h2></div>
+        <div>${kicker('02', 'Capabilities', '서비스')}<h2 class="reveal">필요한 만큼,<br />정확하게.</h2></div>
         <p class="head-note reveal reveal-d1">관심 있는 항목을 <b>견적에 담기</b>로 골라두면 <br />아래 견적 문의서에 자동으로 채워집니다.</p>
       </div>
       <div class="service-grid">
         ${SERVICES.map((s, i) => `
         <article class="service-card reveal reveal-d${(i % 3) + 1}" data-service="${s.id}">
-          <div class="card-glow" aria-hidden="true"></div>
           <div class="card-top"><span class="card-num">${s.num}</span><span class="card-icon">${ICONS[s.icon]}</span></div>
           <h3>${s.title}</h3>
           <ul class="card-tags">${s.meta.map((m) => `<li>${m}</li>`).join('')}</ul>
@@ -152,36 +144,40 @@ app.innerHTML = `
   <section class="studio section" id="studio" data-section>
     <div class="wrap">
       <div class="section-head">
-        <div>${kicker('03', 'MOOD STUDIO')}<h2 class="reveal">우리 집 분위기,<br /><span class="dim">미리 맞춰보세요.</span></h2></div>
-        <p class="head-note reveal reveal-d1">벽지와 바닥 톤을 바꿔보며 원하는 느낌을 찾아보세요. <br />고른 조합은 견적 문의서에 함께 담깁니다.</p>
+        <div>${kicker('03', 'Mood Studio', '분위기 미리보기')}<h2 class="reveal">우리 집 분위기,<br /><span class="dim">미리 맞춰보세요.</span></h2></div>
+        <p class="head-note reveal reveal-d1">벽지 색과 바닥재를 바꿔보며 원하는 느낌을 찾아보세요. <br />고른 조합은 견적 문의서에 함께 담깁니다.</p>
       </div>
       <div class="studio-grid reveal">
-        <figure class="studio-view">
-          <div class="studio-canvas" id="studio-canvas"></div>
-          <figcaption class="studio-caption"><span>SELECTED</span><strong id="studio-name"></strong></figcaption>
+        <figure class="studio-view" data-light="day">
+          <img class="studio-img is-front" alt="" />
+          <img class="studio-img" alt="" aria-hidden="true" />
+          <span class="studio-warm" aria-hidden="true"></span>
+          <span class="studio-loading" aria-hidden="true"></span>
+          <figcaption class="studio-caption"><span>선택한 조합</span><strong id="studio-name"></strong></figcaption>
+          <span class="photo-tag">AI 예시 이미지</span>
         </figure>
         <div class="studio-panel">
           <fieldset class="swatch-group">
-            <legend>벽지 컬러</legend>
-            <div class="swatches" data-group="wall">
-              ${WALLS.map((w) => `<button type="button" class="swatch" data-value="${w.id}" style="--sw:${w.hex}" aria-pressed="false"><span class="swatch-chip"></span><span class="swatch-name">${w.name}</span></button>`).join('')}
+            <legend>벽지 컬러 <span id="wall-name"></span></legend>
+            <div class="wall-swatches" data-group="wall">
+              ${WALLS.map((w) => `<button type="button" class="wall-swatch" data-value="${w.id}" style="--sw:${w.hex}" aria-pressed="false" aria-label="${w.name}" title="${w.name}"><span></span></button>`).join('')}
             </div>
           </fieldset>
           <fieldset class="swatch-group">
             <legend>바닥재</legend>
-            <div class="swatches" data-group="floor">
-              ${FLOORS.map((f) => `<button type="button" class="swatch" data-value="${f.id}" style="--sw:linear-gradient(90deg,${f.a} 50%,${f.b} 50%)" aria-pressed="false"><span class="swatch-chip"></span><span class="swatch-name">${f.name}</span></button>`).join('')}
+            <div class="floor-swatches" data-group="floor">
+              ${FLOORS.map((f) => `<button type="button" class="floor-swatch" data-value="${f.id}" aria-pressed="false"><img src="/assets/rooms/floor-${f.id}.webp" width="240" height="120" alt="" loading="lazy" /><span><b>${f.name}</b><small>${f.sub}</small></span></button>`).join('')}
             </div>
           </fieldset>
-          <div class="studio-toggles">
+          <fieldset class="swatch-group">
+            <legend>조명</legend>
             <div class="segmented" role="group" aria-label="조명">
-              <button type="button" data-light="day" aria-pressed="true">${ICONS.sun}주광색</button>
-              <button type="button" data-light="warm" aria-pressed="false">${ICONS.bulb}전구색</button>
+              <button type="button" data-light="day" aria-pressed="true">${ICONS.sun}주광색 (낮)</button>
+              <button type="button" data-light="warm" aria-pressed="false">${ICONS.bulb}전구색 (저녁)</button>
             </div>
-            <label class="switch"><input type="checkbox" id="accent-toggle" /><span class="switch-track"></span>포인트 벽만 적용</label>
-          </div>
-          <button class="btn btn-primary btn-block" type="button" id="studio-apply"><span class="btn-label">이 조합으로 상담하기</span><span class="btn-icon">${ICONS.right}</span></button>
-          <p class="fine">* 화면 색상은 모니터 환경에 따라 다를 수 있어요. 실제 샘플은 방문 시 보여드립니다.</p>
+          </fieldset>
+          <button class="btn btn-light btn-block" type="button" id="studio-apply"><span class="btn-label">이 조합으로 상담하기</span><span class="btn-icon">${ICONS.right}</span></button>
+          <p class="fine">AI로 만든 예시 사진에 벽지 색을 합성한 이미지예요. 실제 색감은 방문 시 샘플로 확인해 주세요.</p>
         </div>
       </div>
     </div>
@@ -190,8 +186,8 @@ app.innerHTML = `
   <section class="portfolio section" id="portfolio" data-section>
     <div class="wrap">
       <div class="section-head">
-        <div>${kicker('04', 'FIELD NOTES')}<h2 class="reveal">현장에서<br />증명합니다.</h2></div>
-        <div class="case-tabs reveal reveal-d1" role="tablist" aria-label="시공 사례">
+        <div>${kicker('04', 'Before / After', '시공 전후')}<h2 class="reveal">달라지는 건<br /><span class="dim">한눈에 보입니다.</span></h2></div>
+        <div class="case-tabs reveal reveal-d1" role="tablist" aria-label="시공 전후 예시">
           ${CASES.map((c, i) => `<button type="button" role="tab" id="tab-${c.id}" aria-controls="case-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-case="${i}">${c.tab}</button>`).join('')}
         </div>
       </div>
@@ -199,9 +195,10 @@ app.innerHTML = `
         <div class="compare" style="--pos:50%">
           <div class="compare-layer compare-before"></div>
           <div class="compare-layer compare-after"></div>
-          <span class="compare-tag tag-before">BEFORE</span>
           <span class="compare-tag tag-after">AFTER</span>
-          <div class="compare-line"><button class="compare-handle" type="button" role="slider" aria-label="시공 전후 비교 위치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="50%"><span>‹</span><span>›</span></button></div>
+          <span class="compare-tag tag-before">BEFORE</span>
+          <div class="compare-line"><button class="compare-handle" type="button" role="slider" aria-label="시공 전후 비교 위치" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="50%">${ICONS.right}</button></div>
+          <span class="photo-tag">AI 예시 이미지</span>
         </div>
         <div class="case-copy">
           <p class="case-label"></p>
@@ -210,13 +207,13 @@ app.innerHTML = `
           <ol class="case-steps"></ol>
         </div>
       </div>
-      <div class="portfolio-foot reveal"><span>* 사례 이미지는 이해를 돕기 위한 일러스트입니다. 실제 시공 사진은 상담 시 현장 유형에 맞춰 안내드립니다.</span><a class="text-link" href="#quote">비슷한 공간 상담하기 ${ICONS.right}</a></div>
+      <div class="portfolio-foot reveal"><span>* 시공 전후 사진은 이해를 돕기 위해 AI로 생성한 예시입니다. 실제 시공 사진은 상담 시 현장 유형에 맞춰 보여드립니다.</span><a class="text-link" href="#quote">비슷한 공간 상담하기 ${ICONS.right}</a></div>
     </div>
   </section>
 
   <section class="process section" id="process" data-section>
     <div class="wrap">
-      ${kicker('05', 'THE PROCESS')}
+      ${kicker('05', 'The Process', '진행 방식')}
       <div class="process-grid">
         <div class="process-intro">
           <h2 class="reveal">과정을<br /><span class="dim">숨기지 않습니다.</span></h2>
@@ -227,7 +224,7 @@ app.innerHTML = `
         </div>
         <ol class="timeline">
           <span class="timeline-rail" aria-hidden="true"><span class="timeline-fill"></span></span>
-          ${STEPS.map((s) => `<li class="step reveal"><span class="step-dot" aria-hidden="true"></span><span class="step-num">STEP ${s.n}</span><h3>${s.title}</h3><p class="step-sub">${s.sub}</p><p>${s.body}</p></li>`).join('')}
+          ${STEPS.map((s) => `<li class="step reveal"><span class="step-dot" aria-hidden="true"></span><span class="step-num">Step ${s.n}</span><h3>${s.title}</h3><p class="step-sub">${s.sub}</p><p>${s.body}</p></li>`).join('')}
         </ol>
       </div>
     </div>
@@ -236,12 +233,12 @@ app.innerHTML = `
   <section class="faq section" id="faq" data-section>
     <div class="wrap faq-grid">
       <div>
-        ${kicker('06', 'FAQ')}
-        <h2 class="reveal">자주 묻는<br /><span class="dim">질문들.</span></h2>
+        ${kicker('06', 'FAQ', '자주 묻는 질문')}
+        <h2 class="reveal">궁금한 점,<br /><span class="dim">먼저 답해드려요.</span></h2>
         <p class="faq-note reveal reveal-d1">더 궁금한 점은 편하게 전화 주세요.<br /><a class="text-link" href="${TEL}">${PHONE} ${ICONS.phone}</a></p>
       </div>
       <div class="faq-list">
-        ${FAQ.map((f, i) => `<details class="faq-item reveal" name="faq" ${i === 0 ? 'open' : ''}><summary><span class="faq-q">Q${String(i + 1).padStart(2, '0')}</span>${f.q}<span class="faq-plus" aria-hidden="true"></span></summary><div class="faq-a"><p>${f.a}</p></div></details>`).join('')}
+        ${FAQ.map((f, i) => `<details class="faq-item reveal" name="faq" ${i === 0 ? 'open' : ''}><summary><span class="faq-q">${String(i + 1).padStart(2, '0')}</span><span class="faq-text">${f.q}</span><span class="faq-plus" aria-hidden="true"></span></summary><div class="faq-a"><p>${f.a}</p></div></details>`).join('')}
       </div>
     </div>
   </section>
@@ -250,7 +247,7 @@ app.innerHTML = `
     <div class="wrap">
       <div class="quote-panel reveal">
         <div class="quote-intro">
-          ${kicker('07', "LET'S TALK")}
+          <p class="kicker"><span class="kicker-num">07</span><span class="kicker-en">Let's Talk</span><span class="kicker-ko">견적 문의</span></p>
           <h2>이번 공간은<br /><em>어디부터</em> 바꿀까요?</h2>
           <p>몇 가지만 골라주시면 견적 문의 문자가 자동으로 완성됩니다. 사진은 문자에 함께 첨부해 주세요.</p>
           <ul class="quote-points">
@@ -259,8 +256,8 @@ app.innerHTML = `
             <li>${ICONS.check}대표가 직접 확인하고 연락드립니다</li>
           </ul>
           <div class="quote-alt">
-            ${btn('btn-dark', TEL, '바로 전화하기', ICONS.phone)}
-            ${btn('btn-outline-dark booking-link', RES, '네이버 예약', ICONS.calendar)}
+            ${btn('btn-light', TEL, '바로 전화하기', ICONS.phone)}
+            ${btn('btn-ghost booking-link', RES, '네이버 예약', ICONS.calendar)}
           </div>
         </div>
         <form class="quote-form" id="quote-form" novalidate>
@@ -315,46 +312,34 @@ app.innerHTML = `
             <button class="btn btn-dark btn-block" type="submit"><span class="btn-label">${isTouch ? '문자로 견적 문의 보내기' : '견적 문의 내용 복사하기'}</span><span class="btn-icon">${isTouch ? ICONS.message : ICONS.copy}</span></button>
             ${isTouch ? `<button class="btn btn-outline-dark" type="button" id="copy-quote"><span class="btn-label">내용 복사</span><span class="btn-icon">${ICONS.copy}</span></button>` : ''}
           </div>
-          <p class="form-hint">${isTouch ? `문자 앱이 열리면 사진을 첨부해 보내주세요.` : `복사한 내용을 휴대폰 문자(${PHONE})로 보내주시면 빠르게 안내드립니다.`}</p>
+          <p class="form-hint">${isTouch ? '문자 앱이 열리면 사진을 첨부해 보내주세요.' : `복사한 내용을 휴대폰 문자(${PHONE})로 보내주시면 빠르게 안내드립니다.`}</p>
         </form>
       </div>
-      <div class="reservation-note" id="reservation" role="status"><span class="live-dot"></span><span><strong>네이버 예약 링크 연결 준비 중</strong><small>예약 링크가 연결되기 전까지는 전화나 문자로 먼저 상담해 주세요.</small></span><a class="text-link" href="${TEL}">우선 전화로 상담하기 ${ICONS.right}</a></div>
+      <div class="reservation-note" id="reservation" role="status"><span class="dot"></span><span><strong>네이버 예약 링크 연결 준비 중</strong><small>예약 링크가 연결되기 전까지는 전화나 문자로 먼저 상담해 주세요.</small></span><a class="text-link" href="${TEL}">우선 전화로 상담하기 ${ICONS.right}</a></div>
     </div>
   </section>
 
   <section class="contact section" id="contact" data-section>
     <div class="wrap contact-grid">
       <div>
-        ${kicker('08', 'VISIT')}
+        ${kicker('08', 'Visit', '오시는 길')}
         <h2 class="reveal">청주에서,<br /><span class="dim">충청권 어디든.</span></h2>
         <ul class="area-chips reveal reveal-d1" aria-label="방문 견적 지역">${SITE.areas.map((a) => `<li>${a}</li>`).join('')}</ul>
       </div>
       <div class="contact-cards">
-        <div class="map-card reveal">
-          <svg class="map-art" viewBox="0 0 400 220" aria-hidden="true">
-            <defs><pattern id="mapgrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".08"/></pattern></defs>
-            <rect width="400" height="220" fill="url(#mapgrid)"/>
-            <path d="M-10 160 C80 140 120 60 210 70 S330 30 410 50" stroke="currentColor" stroke-opacity=".22" stroke-width="10" fill="none"/>
-            <path d="M120 -10 L170 230" stroke="currentColor" stroke-opacity=".14" stroke-width="6"/>
-            <path d="M0 110 H400" stroke="currentColor" stroke-opacity=".1" stroke-width="3"/>
-            <path d="M290 -10 L250 230" stroke="currentColor" stroke-opacity=".1" stroke-width="3"/>
-            <circle cx="208" cy="104" r="34" fill="#c8102e" opacity=".14" class="map-pulse"/>
-            <circle cx="208" cy="104" r="7" fill="#c8102e"/>
-          </svg>
-          <div class="map-info">
-            <span class="info-label">ADDRESS</span>
-            <p>${SITE.address}</p>
-            <div class="map-links">
-              <a href="${NAVER_MAP}" target="_blank" rel="noopener">네이버 지도 ${ICONS.arrow}</a>
-              <a href="${KAKAO_MAP}" target="_blank" rel="noopener">카카오맵 ${ICONS.arrow}</a>
-              <button type="button" data-copy="${SITE.address}" data-copy-msg="주소를 복사했어요">주소 복사 ${ICONS.copy}</button>
-            </div>
+        <div class="info-card reveal">
+          <span class="info-label">${ICONS.map}주소</span>
+          <p class="info-big">${SITE.address}</p>
+          <div class="pill-links">
+            <a href="${NAVER_MAP}" target="_blank" rel="noopener">네이버 지도 ${ICONS.arrow}</a>
+            <a href="${KAKAO_MAP}" target="_blank" rel="noopener">카카오맵 ${ICONS.arrow}</a>
+            <button type="button" data-copy="${SITE.address}" data-copy-msg="주소를 복사했어요">주소 복사 ${ICONS.copy}</button>
           </div>
         </div>
-        <div class="phone-card reveal reveal-d1">
-          <span class="info-label">PHONE · 대표 직통</span>
-          <a class="phone-big" href="${TEL}">${PHONE}</a>
-          <div class="map-links">
+        <div class="info-card reveal reveal-d1">
+          <span class="info-label">${ICONS.phone}대표 직통</span>
+          <a class="info-phone" href="${TEL}">${PHONE}</a>
+          <div class="pill-links">
             <a href="${TEL}">전화 걸기 ${ICONS.phone}</a>
             <button type="button" data-copy="${PHONE}" data-copy-msg="전화번호를 복사했어요">번호 복사 ${ICONS.copy}</button>
           </div>
@@ -375,9 +360,9 @@ app.innerHTML = `
       <li><span>ADDR</span>${SITE.address}</li>
       <li><span>AREA</span>청주 전 지역 · 오창 · 오송 · 세종 등 충청권</li>
     </ul>
-    <nav class="footer-nav" aria-label="하단 메뉴"><a href="#services">서비스</a><a href="#studio">분위기 미리보기</a><a href="#portfolio">현장 기록</a><a href="#quote">견적 문의</a></nav>
+    <nav class="footer-nav" aria-label="하단 메뉴"><a href="#services">서비스</a><a href="#studio">분위기 미리보기</a><a href="#portfolio">시공 전후</a><a href="#quote">견적 문의</a></nav>
   </div>
-  <div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} CHAKHAN INTERIOR. ALL RIGHTS RESERVED.</span><a href="#top">BACK TO TOP ↑</a></div>
+  <div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} Chakhan Interior. All rights reserved.</span><span>사이트 내 인테리어 사진은 AI로 생성한 예시 이미지입니다.</span></div>
 </footer>
 
 <div class="mobile-cta" aria-label="빠른 상담">
@@ -411,6 +396,7 @@ async function copyText(text) {
   }
 }
 function scrollToEl(el) { el?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' }); }
+const preload = (src) => new Promise((res) => { const i = new Image(); i.onload = i.onerror = () => res(i); i.src = src; });
 
 // ── 등장 애니메이션 ─────────────────────────────────────────
 document.documentElement.classList.add('js');
@@ -429,6 +415,7 @@ const progress = $('.progress span');
 const toTop = $('.to-top');
 const timelineFill = $('.timeline-fill');
 const timeline = $('.timeline');
+const heroPhoto = $('.hero-photo img');
 let ticking = false;
 function onScroll() {
   const y = window.scrollY;
@@ -436,6 +423,7 @@ function onScroll() {
   header.classList.toggle('scrolled', y > 16);
   progress.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
   toTop.classList.toggle('show', y > window.innerHeight * 1.2);
+  if (!reducedMotion && y < window.innerHeight * 1.2) heroPhoto.style.transform = `translateY(${y * 0.08}px) scale(1.06)`;
   if (timeline) {
     const r = timeline.getBoundingClientRect();
     const p = Math.min(1, Math.max(0, (window.innerHeight * 0.6 - r.top) / r.height));
@@ -473,38 +461,6 @@ toggle.addEventListener('click', () => setMenu(!header.classList.contains('menu-
 $$('.nav a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && header.classList.contains('menu-open')) { setMenu(false); toggle.focus(); } });
 window.matchMedia('(min-width: 961px)').addEventListener('change', (m) => { if (m.matches) setMenu(false); });
-
-// ── 히어로: 스포트라이트 · 틸트 · 마그네틱 버튼 ────────────────
-if (!reducedMotion && finePointer) {
-  const hero = $('.hero');
-  const tilt = $('.tilt');
-  hero.addEventListener('pointermove', (e) => {
-    const r = hero.getBoundingClientRect();
-    hero.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    hero.style.setProperty('--my', `${e.clientY - r.top}px`);
-    const tr = tilt.getBoundingClientRect();
-    const x = ((e.clientX - tr.left) / tr.width - 0.5);
-    const y = ((e.clientY - tr.top) / tr.height - 0.5);
-    tilt.style.transform = `rotateX(${(-y * 14).toFixed(2)}deg) rotateY(${(x * 14).toFixed(2)}deg)`;
-    hero.style.setProperty('--px', x.toFixed(3));
-    hero.style.setProperty('--py', y.toFixed(3));
-  });
-  hero.addEventListener('pointerleave', () => { tilt.style.transform = ''; hero.style.setProperty('--px', 0); hero.style.setProperty('--py', 0); });
-
-  $$('.magnetic').forEach((el) => {
-    el.addEventListener('pointermove', (e) => {
-      const r = el.getBoundingClientRect();
-      el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.18}px, ${(e.clientY - r.top - r.height / 2) * 0.3}px)`;
-    });
-    el.addEventListener('pointerleave', () => { el.style.transform = ''; });
-  });
-
-  $$('.service-card').forEach((card) => card.addEventListener('pointermove', (e) => {
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--cx', `${e.clientX - r.left}px`);
-    card.style.setProperty('--cy', `${e.clientY - r.top}px`);
-  }));
-}
 
 // ── 숫자 카운트업 ───────────────────────────────────────────
 const countIO = new IntersectionObserver((entries) => entries.forEach((e) => {
@@ -547,41 +503,60 @@ function toggleService(id, announce) {
 }
 $$('[data-pick]').forEach((b) => b.addEventListener('click', () => toggleService(b.dataset.pick, true)));
 
-// ── 분위기 미리보기 ─────────────────────────────────────────
-const canvas = $('#studio-canvas');
-function renderStudio() {
+// ── 분위기 미리보기 (실사 사진 크로스페이드) ───────────────────
+const view = $('.studio-view');
+const [imgA, imgB] = $$('.studio-img');
+let front = imgA;
+let renderToken = 0;
+const moodLabel = () => {
   const wall = WALLS.find((w) => w.id === state.viz.wall);
   const floor = FLOORS.find((f) => f.id === state.viz.floor);
-  const base = WALLS[0];
-  canvas.innerHTML = roomSVG({
-    id: 'studio',
-    wall: wall.hex,
-    side: state.viz.accent ? base.shade : wall.shade,
-    floor,
-    light: state.viz.light
-  });
-  $('#studio-name').textContent = `${wall.name}${state.viz.accent ? ' 포인트' : ''} · ${floor.name} · ${state.viz.light === 'warm' ? '전구색' : '주광색'}`;
-  $$('.swatches[data-group="wall"] .swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === wall.id)));
-  $$('.swatches[data-group="floor"] .swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === floor.id)));
+  return `${wall.name} 벽지 · ${floor.name} · ${state.viz.light === 'warm' ? '전구색' : '주광색'}`;
+};
+async function renderStudio(first = false) {
+  const wall = WALLS.find((w) => w.id === state.viz.wall);
+  const floor = FLOORS.find((f) => f.id === state.viz.floor);
+  $('#studio-name').textContent = moodLabel();
+  $('#wall-name').textContent = wall.name;
+  $$('.wall-swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === wall.id)));
+  $$('.floor-swatch').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.value === floor.id)));
   $$('[data-light]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.light === state.viz.light)));
+  view.dataset.light = state.viz.light;
+  const src = roomSrc(floor.id, wall.id);
+  const alt = `${wall.name} 벽지와 ${floor.name} 바닥으로 꾸민 거실 (AI 예시 이미지)`;
+  if (first) { front.src = src; front.alt = alt; return; }
+  if (front.getAttribute('src') === src) return;
+  const token = ++renderToken;
+  view.classList.add('loading');
+  await preload(src);
+  if (token !== renderToken) return;
+  view.classList.remove('loading');
+  const back = front === imgA ? imgB : imgA;
+  back.src = src; back.alt = alt; back.removeAttribute('aria-hidden');
+  back.classList.add('is-front'); front.classList.remove('is-front'); front.setAttribute('aria-hidden', 'true');
+  front = back;
 }
-$$('.swatches').forEach((group) => group.addEventListener('click', (e) => {
-  const b = e.target.closest('.swatch'); if (!b) return;
+$$('[data-group]').forEach((group) => group.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
   state.viz[group.dataset.group] = b.dataset.value;
-  canvas.classList.remove('flash'); void canvas.offsetWidth; canvas.classList.add('flash');
   renderStudio();
 }));
 $$('[data-light]').forEach((b) => b.addEventListener('click', () => { state.viz.light = b.dataset.light; renderStudio(); }));
-$('#accent-toggle').addEventListener('change', (e) => { state.viz.accent = e.target.checked; renderStudio(); });
 $('#studio-apply').addEventListener('click', () => {
-  state.mood = $('#studio-name').textContent;
-  if (!state.services.has('wallpaper')) state.services.add('wallpaper');
-  if (!state.services.has('floor')) state.services.add('floor');
+  state.mood = moodLabel();
+  state.services.add('wallpaper'); state.services.add('floor');
   syncServices();
   toast('분위기 조합을 견적 문의서에 담았어요');
   scrollToEl($('#quote'));
 });
-renderStudio();
+renderStudio(true);
+// 섹션에 가까워지면 같은 바닥의 다른 벽 색 사진을 미리 받아둡니다.
+new IntersectionObserver((entries, obs) => {
+  if (!entries[0].isIntersecting) return;
+  obs.disconnect();
+  WALLS.forEach((w) => preload(roomSrc(state.viz.floor, w.id)));
+  FLOORS.forEach((f) => preload(roomSrc(f.id, state.viz.wall)));
+}, { rootMargin: '600px 0px' }).observe(view);
 
 // ── 시공 전후 비교 ──────────────────────────────────────────
 const compare = $('.compare');
@@ -593,21 +568,7 @@ function setPos(v) {
   handle.setAttribute('aria-valuenow', String(Math.round(pos)));
   handle.setAttribute('aria-valuetext', `시공 후 ${Math.round(pos)}% 표시`);
 }
-function layer(c, which) {
-  const img = c[which];
-  if (img) return `<img src="${esc(img)}" alt="${esc(c.tab)} 시공 ${which === 'before' ? '전' : '후'}" loading="lazy" />`;
-  const s = c.scene;
-  const isBefore = which === 'before';
-  return roomSVG({
-    id: `${c.id}-${which}`,
-    wall: isBefore ? s.beforeWall : s.afterWall,
-    side: isBefore ? s.beforeWall : s.afterWall,
-    floor: { a: (isBefore ? s.beforeFloor : s.afterFloor)[0], b: (isBefore ? s.beforeFloor : s.afterFloor)[1], type: c.id === 'store' && !isBefore ? 'tile' : 'plank' },
-    worn: isBefore,
-    plant: s.plant && !isBefore,
-    light: isBefore ? 'day' : 'warm'
-  });
-}
+const layer = (c, which) => `<img src="${esc(c[which])}" alt="${esc(c.tab)} 시공 ${which === 'before' ? '전' : '후'} (AI 예시 이미지)" loading="lazy" draggable="false" />`;
 let caseIndex = 0;
 function renderCase(i, focus = false) {
   caseIndex = i;
@@ -622,6 +583,7 @@ function renderCase(i, focus = false) {
   $('#case-panel').setAttribute('aria-labelledby', `tab-${c.id}`);
   $('.case').classList.remove('swap'); void $('.case').offsetWidth; $('.case').classList.add('swap');
   setPos(50);
+  const next = CASES[(i + 1) % CASES.length]; preload(next.before); preload(next.after);
 }
 $$('[role="tab"]').forEach((t) => {
   t.addEventListener('click', () => renderCase(Number(t.dataset.case)));
@@ -643,16 +605,16 @@ handle.addEventListener('keydown', (e) => {
   if (e.key === 'End') { e.preventDefault(); setPos(100); }
 });
 renderCase(0);
-// 처음 보일 때 슬라이더 힌트 모션
 if (!reducedMotion) {
   const hintIO = new IntersectionObserver((entries) => {
     if (!entries[0].isIntersecting) return;
     hintIO.disconnect();
-    const frames = [[0, 50], [500, 30], [1100, 70], [1600, 50]];
-    const t0 = performance.now();
+    const frames = [[0, 50], [600, 28], [1300, 72], [1900, 50]];
+    const t0 = performance.now() + 400;
     const run = (now) => {
       if (dragging) return;
       const t = now - t0;
+      if (t < 0) { requestAnimationFrame(run); return; }
       const k = frames.findIndex((f) => f[0] > t);
       if (k === -1) { setPos(50); return; }
       const [ta, va] = frames[k - 1]; const [tb, vb] = frames[k];
@@ -660,12 +622,12 @@ if (!reducedMotion) {
       setPos(va + (vb - va) * ease);
       requestAnimationFrame(run);
     };
-    setTimeout(() => requestAnimationFrame(run), 400);
+    requestAnimationFrame(run);
   }, { threshold: 0.5 });
   hintIO.observe(compare);
 }
 
-// ── FAQ: 하나만 열기 ────────────────────────────────────────
+// ── FAQ: 하나만 열기 (name 속성 미지원 브라우저용) ─────────────
 $$('.faq-item').forEach((d) => d.addEventListener('toggle', () => { if (d.open) $$('.faq-item').forEach((o) => { if (o !== d) o.open = false; }); }));
 
 // ── 견적 문의서 ─────────────────────────────────────────────
@@ -696,8 +658,7 @@ function updateQuote() {
   moodTag.hidden = !state.mood;
   if (state.mood) moodTag.querySelector('strong').textContent = state.mood;
   $('#quote-preview').textContent = buildMessage();
-  const { mood, ...persist } = state;
-  store.set('chakhan-quote', { ...persist, services: [...state.services], viz: undefined });
+  store.set('chakhan-quote', { services: [...state.services], space: state.space, size: state.size, timing: state.timing, area: state.area, name: state.name, contact: state.contact, memo: state.memo });
 }
 
 sizeInput.value = state.size;
@@ -732,7 +693,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   if (!validate()) return;
   if (isTouch) {
-    const sep = /iPhone|iPad|iPod/.test(navigator.userAgent) ? '&' : '?';
+    const sep = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) ? '&' : '?';
     window.location.href = `sms:${PHONE.replace(/-/g, '')}${sep}body=${encodeURIComponent(buildMessage())}`;
   } else {
     copyQuote();

@@ -19,6 +19,21 @@ npm run build    # dist/ 에 배포용 파일 생성
 | 분위기 미리보기 색상 | `WALLS`, `FLOORS` |
 | 진행 단계 · FAQ | `STEPS`, `FAQ` |
 
+## v3 (현재)
+
+**디자인**
+- 따뜻한 차콜 · 크림 · 샌드 톤과 세리프(Instrument Serif) 포인트의 에디토리얼 스타일
+- 히어로: 3D 로고 · 궤도 장식 대신 실사 인테리어 사진 + 정보 카드
+- 움직이던 키워드 띠(✳ 기호가 iPhone · iPad에서 초록 이모지로 보이던 문제 포함)를 정적인 "14가지 시공 범위" 밴드로 교체
+
+**분위기 미리보기 · 시공 전후 = 실사 이미지**
+- Higgsfield(Seedream 5.0 Flash)로 거실 사진 1장을 만들고, 같은 구도에서 바닥재만 바꾼 사진 3장을 추가 생성
+- 벽 영역을 자동으로 따서(`tools/wall_mask.py`) 6가지 벽지 색을 빛 · 그림자를 유지한 채 합성(`tools/compose_rooms.py`)
+  → 바닥 4종 × 벽지 6색 = 24장 (`public/assets/rooms/`), 조명(주광/전구색)은 색 보정으로 표현
+- 시공 전후 3사례: "전" 사진을 만들고 같은 방을 편집해 "후" 사진 생성 (`public/assets/cases/`)
+- **모든 인테리어 사진은 AI 예시 이미지**이며, 사이트에도 그렇게 표시되어 있습니다.
+  실제 시공 사진이 생기면 `src/data.js`의 `CASES` 경로만 바꾸면 됩니다.
+
 ## v2에서 달라진 점
 
 **디자인**
@@ -45,3 +60,4 @@ npm run build    # dist/ 에 배포용 파일 생성
 - 도메인 연결: Cloudflare 대시보드 → Workers & Pages → chakhan-interior → Custom domains
 - GitHub 자동 배포를 원하면 GitHub 업로드 후 Cloudflare에서 Git 연동 프로젝트로 다시 만들면 됩니다
   (빌드 명령 `npm run build`, 출력 폴더 `dist`, 루트 폴더 `chakhan-interior`)
+- 캐시: 해시가 붙은 빌드 파일만 1년, `rooms/` · `cases/` 사진은 1일 (`public/_headers`)

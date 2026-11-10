@@ -34,59 +34,56 @@ export const PILLARS = [
   { k: '03', title: '대표가 끝까지 관리', body: '보양부터 마감 확인까지 대표가 직접 챙기고, 사용·A/S 방법까지 안내합니다.' }
 ];
 
-// 분위기 미리보기 — 벽/바닥 팔레트
+// 분위기 미리보기 — 사진은 public/assets/rooms/room-{바닥}-{벽}.webp
+// (AI로 생성한 실사 예시 사진에 벽지 색만 합성한 이미지입니다)
 export const WALLS = [
-  { id: 'white', name: '퓨어 화이트', hex: '#f4f2ec', shade: '#dedad0' },
-  { id: 'ivory', name: '웜 아이보리', hex: '#efe6d4', shade: '#d9ccb4' },
-  { id: 'greige', name: '그레이지', hex: '#d6cfc4', shade: '#bdb4a6' },
-  { id: 'sage', name: '세이지 그린', hex: '#c9d0bd', shade: '#adb69e' },
-  { id: 'blue', name: '더스티 블루', hex: '#c3ccd3', shade: '#a6b1ba' },
-  { id: 'charcoal', name: '차콜 포인트', hex: '#55534f', shade: '#43413e' }
+  { id: 'white', name: '퓨어 화이트', hex: '#ecebe6' },
+  { id: 'ivory', name: '웜 아이보리', hex: '#e9dfcc' },
+  { id: 'greige', name: '그레이지', hex: '#d3cbbf' },
+  { id: 'sage', name: '세이지 그린', hex: '#bfc6b3' },
+  { id: 'blue', name: '더스티 블루', hex: '#b8c2ca' },
+  { id: 'charcoal', name: '차콜 포인트', hex: '#5b5853' }
 ];
 
 export const FLOORS = [
-  { id: 'oak', name: '라이트 오크', a: '#c9a57f', b: '#b8936c', type: 'plank' },
-  { id: 'natural', name: '내추럴 메이플', a: '#d9bf98', b: '#c9ac83', type: 'plank' },
-  { id: 'walnut', name: '월넛', a: '#7a5a43', b: '#6a4c37', type: 'plank' },
-  { id: 'herring', name: '헤링본', a: '#b38d68', b: '#9f7a57', type: 'herringbone' },
-  { id: 'stone', name: '그레이 타일', a: '#a9a7a1', b: '#97958f', type: 'tile' }
+  { id: 'oak', name: '라이트 오크', sub: '강마루' },
+  { id: 'herring', name: '헤링본', sub: '원목 마루' },
+  { id: 'walnut', name: '월넛', sub: '강마루' },
+  { id: 'tile', name: '그레이 타일', sub: '포세린' }
 ];
 
-// 현장 기록 — 실제 사진이 생기면 before/after 에 이미지 경로를 넣으세요.
-// 예) before: '/assets/cases/apt-before.jpg', after: '/assets/cases/apt-after.jpg'
+// 시공 전후 비교 — 현재는 AI로 생성한 예시 사진입니다.
+// 실제 시공 사진이 생기면 before/after 경로만 바꿔주세요. (public/assets/cases/)
 export const CASES = [
   {
     id: 'apt',
     tab: '아파트 거실',
-    label: 'CASE 01 / APARTMENT',
-    title: ['화이트 벽지 하나로', '빛의 밀도', '를 바꾼 현장'],
-    body: '얼룩진 벽면을 정리하고, 생활광이 잘 퍼지는 톤을 선택했습니다. 색을 바꾸는 일은 공간의 쓰임을 다시 설계하는 일입니다.',
-    steps: ['현장 체크', '실크 벽지 제안', '마감 확인'],
-    scene: { beforeWall: '#9d9b92', afterWall: '#f4f1e8', beforeFloor: ['#6e6d67', '#7f7e76'], afterFloor: ['#c9a57f', '#b8936c'], plant: true },
-    before: null,
-    after: null
+    label: 'EXAMPLE 01 · 아파트',
+    title: ['얼룩진 꽃무늬 벽지를', '실크 도배', '로 정리한 거실'],
+    body: '들뜨고 곰팡이가 핀 기존 벽지를 걷어내고, 초배부터 다시 잡아 실크 벽지로 마감하는 경우의 예시입니다. 바닥은 밝은 오크 강마루로 함께 바꿨습니다.',
+    steps: ['기존 벽지 · 곰팡이 제거', '초배 · 실크 도배', '강마루 · 걸레받이 마감'],
+    before: '/assets/cases/apt-before.webp',
+    after: '/assets/cases/apt-after.webp'
   },
   {
     id: 'room',
     tab: '원룸 바닥',
-    label: 'CASE 02 / STUDIO',
+    label: 'EXAMPLE 02 · 원룸',
     title: ['들뜬 장판을', '강마루', '로 바꾼 원룸'],
-    body: '들뜨고 변색된 장판을 걷어내고 바닥 수평부터 다시 잡았습니다. 작은 공간일수록 바닥 톤이 공간의 넓이를 결정합니다.',
-    steps: ['바닥 수평 확인', '강마루 시공', '걸레받이 마감'],
-    scene: { beforeWall: '#b8b3a6', afterWall: '#ebe5d8', beforeFloor: ['#8a7a5a', '#7a6b4e'], afterFloor: ['#d9bf98', '#c9ac83'], plant: false },
-    before: null,
-    after: null
+    body: '찢어지고 들뜬 장판을 걷어내고 바닥 수평을 확인한 뒤 강마루로 교체하는 경우의 예시입니다. 작은 공간일수록 바닥 톤이 넓이를 결정합니다.',
+    steps: ['기존 장판 철거', '바닥 수평 확인', '강마루 · 걸레받이'],
+    before: '/assets/cases/room-before.webp',
+    after: '/assets/cases/room-after.webp'
   },
   {
     id: 'store',
     tab: '상가 · 학원',
-    label: 'CASE 03 / COMMERCIAL',
+    label: 'EXAMPLE 03 · 상가',
     title: ['집중이 잘 되는', '차분한 톤', '의 학원'],
-    body: '학생 동선과 조명 반사를 고려해 벽은 차분하게, 바닥은 관리가 쉬운 데코타일로 마감했습니다.',
-    steps: ['동선 확인', '데코타일 · 도장', '야간 공정'],
-    scene: { beforeWall: '#a49e90', afterWall: '#c9d0bd', beforeFloor: ['#77746d', '#6a6760'], afterFloor: ['#a9a7a1', '#97958f'], plant: true },
-    before: null,
-    after: null
+    body: '학생 동선과 조명 반사를 고려해 벽은 차분하게, 바닥은 관리가 쉬운 데코타일로 마감하는 경우의 예시입니다.',
+    steps: ['벽면 보수 · 도장', '데코타일 시공', '야간 · 주말 공정'],
+    before: '/assets/cases/store-before.webp',
+    after: '/assets/cases/store-after.webp'
   }
 ];
 
