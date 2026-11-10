@@ -1,14 +1,21 @@
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import './style.css';
-import { SITE, PLACEHOLDER_RESERVATION, SERVICES, TICKER, PILLARS, WALLS, FLOORS, CASES, STEPS, METRICS, FAQ, QUOTE_OPTIONS } from './data.js';
+import { SITE, PLACEHOLDER_RESERVATION, SERVICES, TICKER, BRANDS, PRICE_ITEMS, PILLARS, WALLS, FLOORS, CASES, STEPS, METRICS, FAQ, QUOTE_OPTIONS } from './data.js';
 import { ICONS } from './scene.js';
 
 const { phone: PHONE } = SITE;
 const TEL = `tel:${PHONE.replace(/-/g, '')}`;
 const RES = SITE.reservationUrl;
-const MAP_Q = encodeURIComponent(SITE.address.replace(', 1층', ''));
-const NAVER_MAP = `https://map.naver.com/p/search/${MAP_Q}`;
-const KAKAO_MAP = `https://map.kakao.com/link/search/${MAP_Q}`;
+const NAVER_MAP = SITE.links.naverMap;
+const KAKAO_MAP = SITE.links.kakaoMap;
+const PLACE_TEL = `tel:${SITE.placePhone.replace(/-/g, '')}`;
+const ext = 'target="_blank" rel="noopener"';
+const SOCIALS = [
+  ['instagram', '인스타그램', SITE.links.instagram],
+  ['blog', '네이버 블로그', SITE.links.blog],
+  ['cafe', '네이버 카페', SITE.links.cafe],
+  ['youtube', '유튜브', SITE.links.youtube]
+];
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -52,6 +59,7 @@ app.innerHTML = `
   </a>
   <nav class="nav" id="site-nav" aria-label="주요 메뉴">
     <a href="#services">서비스</a>
+    <a href="#materials">자재 · 가격</a>
     <a href="#studio">분위기 미리보기</a>
     <a href="#portfolio">시공 전후</a>
     <a href="#process">진행 방식</a>
@@ -85,7 +93,7 @@ app.innerHTML = `
       <dl class="hero-stats reveal reveal-d4">
         <div><dt>무료</dt><dd>방문 견적</dd></div>
         <div><dt>대표 직접</dt><dd>상담 · 시공 관리</dd></div>
-        <div><dt>13<sup>+</sup></dt><dd>마감 공정 대응</dd></div>
+        <div><dt><a href="${SITE.reviews.url}" ${ext}>${SITE.reviews.count}<span class="stat-star">${ICONS.star}</span></a></dt><dd><a href="${SITE.reviews.url}" ${ext}>네이버 방문자 리뷰 ↗</a></dd></div>
       </dl>
     </div>
     <figure class="hero-media reveal reveal-d1">
@@ -99,10 +107,13 @@ app.innerHTML = `
     </figure>
   </section>
 
-  <section class="scope" aria-label="시공 가능 항목">
-    <div class="wrap scope-inner">
-      <p class="scope-label"><span>${TICKER.length}</span>가지 시공 범위</p>
-      <ul class="scope-list">${TICKER.map((t) => `<li>${t}</li>`).join('')}</ul>
+  <section class="scope" aria-label="시공 가능 항목 ${TICKER.length}가지">
+    <p class="scope-label"><span>${TICKER.length}</span>가지<br />시공 범위</p>
+    <div class="marquee">
+      <div class="marquee-track">
+        <ul class="marquee-list">${TICKER.map((t) => `<li>${t}</li>`).join('')}</ul>
+        <ul class="marquee-list" aria-hidden="true">${TICKER.map((t) => `<li>${t}</li>`).join('')}</ul>
+      </div>
     </div>
   </section>
 
@@ -113,6 +124,7 @@ app.innerHTML = `
         <h2 class="reveal">좋은 공간은<br /><span class="dim">보이는 것보다</span><br />더 많은 걸 바꿉니다.</h2>
         <div class="intro-body reveal reveal-d1">
           <p>벽지 한 장, 바닥 한 칸을 고를 때도 집의 구조와 빛, 생활 습관을 먼저 생각합니다. 예쁜 결과보다 오래 만족하는 과정을 설계합니다.</p>
+          <blockquote class="promise"><p>작은 견적, 큰 견적 구분 없이 늘 최선을 다하고 있습니다. 편안하게 문의 주시면 최선을 다해 상담해 드리겠습니다.</p><cite>— ${SITE.name}</cite></blockquote>
           <a class="text-link" href="#process">우리가 일하는 방식 보기 ${ICONS.right}</a>
         </div>
       </div>
@@ -141,10 +153,34 @@ app.innerHTML = `
     </div>
   </section>
 
+  <section class="materials section" id="materials" data-section>
+    <div class="wrap">
+      <div class="section-head">
+        <div>${kicker('03', 'Materials & Price', '자재 · 가격표')}<h2 class="reveal">믿을 수 있는 자재,<br /><span class="dim">투명한 견적.</span></h2></div>
+        <p class="head-note reveal reveal-d1">검증된 브랜드 자재로 시공합니다. <br />가격은 자재 · 면적 · 현장 상태에 따라 달라 방문 후 정확히 안내드려요.</p>
+      </div>
+      <div class="materials-grid">
+        <div class="brand-card reveal">
+          <h3>취급 자재 브랜드</h3>
+          ${BRANDS.map((b) => `<div class="brand-group"><span class="brand-group-name">${b.group}</span><ul>${b.items.map((i) => `<li>${i}</li>`).join('')}</ul></div>`).join('')}
+        </div>
+        <div class="price-card reveal reveal-d1">
+          <div class="price-head"><h3>가격표 항목</h3><span>네이버 플레이스 기준</span></div>
+          <ul class="price-list">${PRICE_ITEMS.map((i) => `<li><span>${i}</span><em>변동 · 상담 후 안내</em></li>`).join('')}</ul>
+        </div>
+        <a class="coupon-card reveal reveal-d2" href="${SITE.coupon.url}" ${ext}>
+          <span class="coupon-icon">${ICONS.ticket}</span>
+          <span class="coupon-text"><small>네이버 플레이스 쿠폰</small><strong>${SITE.coupon.amount} 할인 쿠폰</strong><span>네이버 플레이스에서 다운로드 후 상담 시 말씀해 주세요</span></span>
+          <span class="coupon-cta">쿠폰 받기 ${ICONS.arrow}</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <section class="studio section" id="studio" data-section>
     <div class="wrap">
       <div class="section-head">
-        <div>${kicker('03', 'Mood Studio', '분위기 미리보기')}<h2 class="reveal">우리 집 분위기,<br /><span class="dim">미리 맞춰보세요.</span></h2></div>
+        <div>${kicker('04', 'Mood Studio', '분위기 미리보기')}<h2 class="reveal">우리 집 분위기,<br /><span class="dim">미리 맞춰보세요.</span></h2></div>
         <p class="head-note reveal reveal-d1">벽지 색과 바닥재를 바꿔보며 원하는 느낌을 찾아보세요. <br />고른 조합은 견적 문의서에 함께 담깁니다.</p>
       </div>
       <div class="studio-grid reveal">
@@ -186,7 +222,7 @@ app.innerHTML = `
   <section class="portfolio section" id="portfolio" data-section>
     <div class="wrap">
       <div class="section-head">
-        <div>${kicker('04', 'Before / After', '시공 전후')}<h2 class="reveal">달라지는 건<br /><span class="dim">한눈에 보입니다.</span></h2></div>
+        <div>${kicker('05', 'Before / After', '시공 전후')}<h2 class="reveal">달라지는 건<br /><span class="dim">한눈에 보입니다.</span></h2></div>
         <div class="case-tabs reveal reveal-d1" role="tablist" aria-label="시공 전후 예시">
           ${CASES.map((c, i) => `<button type="button" role="tab" id="tab-${c.id}" aria-controls="case-panel" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-case="${i}">${c.tab}</button>`).join('')}
         </div>
@@ -213,7 +249,7 @@ app.innerHTML = `
 
   <section class="process section" id="process" data-section>
     <div class="wrap">
-      ${kicker('05', 'The Process', '진행 방식')}
+      ${kicker('06', 'The Process', '진행 방식')}
       <div class="process-grid">
         <div class="process-intro">
           <h2 class="reveal">과정을<br /><span class="dim">숨기지 않습니다.</span></h2>
@@ -233,7 +269,7 @@ app.innerHTML = `
   <section class="faq section" id="faq" data-section>
     <div class="wrap faq-grid">
       <div>
-        ${kicker('06', 'FAQ', '자주 묻는 질문')}
+        ${kicker('07', 'FAQ', '자주 묻는 질문')}
         <h2 class="reveal">궁금한 점,<br /><span class="dim">먼저 답해드려요.</span></h2>
         <p class="faq-note reveal reveal-d1">더 궁금한 점은 편하게 전화 주세요.<br /><a class="text-link" href="${TEL}">${PHONE} ${ICONS.phone}</a></p>
       </div>
@@ -247,7 +283,7 @@ app.innerHTML = `
     <div class="wrap">
       <div class="quote-panel reveal">
         <div class="quote-intro">
-          <p class="kicker"><span class="kicker-num">07</span><span class="kicker-en">Let's Talk</span><span class="kicker-ko">견적 문의</span></p>
+          <p class="kicker"><span class="kicker-num">08</span><span class="kicker-en">Let's Talk</span><span class="kicker-ko">견적 문의</span></p>
           <h2>이번 공간은<br /><em>어디부터</em> 바꿀까요?</h2>
           <p>몇 가지만 골라주시면 견적 문의 문자가 자동으로 완성됩니다. 사진은 문자에 함께 첨부해 주세요.</p>
           <ul class="quote-points">
@@ -257,7 +293,8 @@ app.innerHTML = `
           </ul>
           <div class="quote-alt">
             ${btn('btn-light', TEL, '바로 전화하기', ICONS.phone)}
-            ${btn('btn-ghost booking-link', RES, '네이버 예약', ICONS.calendar)}
+            ${btn('btn-ghost', SITE.links.talk, '네이버 톡톡 문의', ICONS.chat, ext)}
+            ${btn('btn-ghost booking-link', RES, '네이버 예약', ICONS.calendar, RES.startsWith('http') ? ext : '')}
           </div>
         </div>
         <form class="quote-form" id="quote-form" novalidate>
@@ -322,7 +359,7 @@ app.innerHTML = `
   <section class="contact section" id="contact" data-section>
     <div class="wrap contact-grid">
       <div>
-        ${kicker('08', 'Visit', '오시는 길')}
+        ${kicker('09', 'Visit', '오시는 길')}
         <h2 class="reveal">청주에서,<br /><span class="dim">충청권 어디든.</span></h2>
         <ul class="area-chips reveal reveal-d1" aria-label="방문 견적 지역">${SITE.areas.map((a) => `<li>${a}</li>`).join('')}</ul>
       </div>
@@ -339,9 +376,23 @@ app.innerHTML = `
         <div class="info-card reveal reveal-d1">
           <span class="info-label">${ICONS.phone}대표 직통</span>
           <a class="info-phone" href="${TEL}">${PHONE}</a>
+          <dl class="info-rows">
+            <div><dt>네이버 플레이스</dt><dd><a href="${PLACE_TEL}">${SITE.placePhone}</a></dd></div>
+            <div><dt>영업시간</dt><dd>${SITE.hours} <a href="${NAVER_MAP}" ${ext}>요일별 시간 보기 ↗</a></dd></div>
+            <div><dt>방문</dt><dd>방문 접수 · 출장 견적 · 예약 가능</dd></div>
+          </dl>
           <div class="pill-links">
             <a href="${TEL}">전화 걸기 ${ICONS.phone}</a>
+            <a href="${SITE.links.talk}" ${ext}>네이버 톡톡 ${ICONS.chat}</a>
             <button type="button" data-copy="${PHONE}" data-copy-msg="전화번호를 복사했어요">번호 복사 ${ICONS.copy}</button>
+          </div>
+        </div>
+        <div class="info-card reveal reveal-d2">
+          <span class="info-label">${ICONS.star}시공 사례 · 소식</span>
+          <p class="info-sub">실제 시공 사진과 후기는 아래 채널에서 보실 수 있어요.</p>
+          <div class="social-grid">
+            <a href="${SITE.reviews.url}" ${ext}>${ICONS.star}<span><b>네이버 리뷰</b><small>방문자 리뷰 ${SITE.reviews.count}개</small></span></a>
+            ${SOCIALS.map(([icon, label, url]) => `<a href="${url}" ${ext}>${ICONS[icon]}<span><b>${label}</b><small>바로가기</small></span></a>`).join('')}
           </div>
         </div>
       </div>
@@ -356,11 +407,13 @@ app.innerHTML = `
       <div><strong>${SITE.name}</strong><p>소통으로 만들어지는 아름다운 생활공간</p></div>
     </div>
     <ul class="footer-info">
-      <li><span>TEL</span><a href="${TEL}">${PHONE}</a></li>
+      <li><span>TEL</span><a href="${TEL}">${PHONE}</a> · <a href="${PLACE_TEL}">${SITE.placePhone}</a></li>
+      <li><span>HOURS</span>${SITE.hours}</li>
       <li><span>ADDR</span>${SITE.address}</li>
       <li><span>AREA</span>청주 전 지역 · 오창 · 오송 · 세종 등 충청권</li>
     </ul>
-    <nav class="footer-nav" aria-label="하단 메뉴"><a href="#services">서비스</a><a href="#studio">분위기 미리보기</a><a href="#portfolio">시공 전후</a><a href="#quote">견적 문의</a></nav>
+    <nav class="footer-nav" aria-label="하단 메뉴"><a href="#services">서비스</a><a href="#materials">자재 · 가격표</a><a href="#studio">분위기 미리보기</a><a href="#quote">견적 문의</a></nav>
+    <div class="footer-social">${SOCIALS.map(([icon, label, url]) => `<a href="${url}" ${ext} aria-label="${label}" title="${label}">${ICONS[icon]}</a>`).join('')}<a href="${SITE.links.talk}" ${ext} aria-label="네이버 톡톡" title="네이버 톡톡">${ICONS.chat}</a></div>
   </div>
   <div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} Chakhan Interior. All rights reserved.</span><span>사이트 내 인테리어 사진은 AI로 생성한 예시 이미지입니다.</span></div>
 </footer>
@@ -368,7 +421,7 @@ app.innerHTML = `
 <div class="mobile-cta" aria-label="빠른 상담">
   <a href="${TEL}">${ICONS.phone}<span>전화</span></a>
   <a href="#quote">${ICONS.message}<span>견적 문의</span></a>
-  <a class="booking-link" href="${RES}">${ICONS.calendar}<span>예약</span></a>
+  <a class="booking-link" href="${RES}" ${RES.startsWith('http') ? ext : ''}>${ICONS.calendar}<span>예약</span></a>
 </div>
 <button class="to-top" type="button" aria-label="맨 위로">${ICONS.up}</button>
 <div class="toast" role="status" aria-live="polite"></div>

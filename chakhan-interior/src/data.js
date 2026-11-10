@@ -6,27 +6,54 @@
 export const SITE = {
   name: '착한 도배 장판 인테리어 청주점',
   shortName: '착한',
-  phone: '010-8887-4785',
+  tagline: '청주시 도배 · 장판 · 인테리어 전문업체',
+  phone: '010-8887-4785', // 대표 직통
+  placePhone: '0507-1381-4785', // 네이버 플레이스 대표번호
   address: '충북 청주시 청원구 향군로 113, 1층',
-  addressLines: ['충북 청주시 청원구', '향군로 113, 1층'],
-  // 실제 네이버 예약 URL을 받으면 이 한 줄만 교체하면 모든 예약 버튼에 반영됩니다.
-  reservationUrl: '#reservation',
-  areas: ['청주 상당구', '청주 서원구', '청주 흥덕구', '청주 청원구', '오창', '오송', '세종', '충청권 상담']
+  hours: '21:00 영업 종료', // 요일별 영업시간은 네이버 플레이스 기준
+  // 예약 버튼이 연결되는 곳 — 네이버 플레이스(예약 · 쿠폰). 직접 예약 링크가 생기면 바꿔주세요.
+  reservationUrl: 'https://map.naver.com/p/entry/place/1300845538',
+  areas: ['청주 상당구', '청주 서원구', '청주 흥덕구', '청주 청원구', '오창', '오송', '세종', '충청권 상담'],
+  reviews: { count: 611, url: 'https://pcmap.place.naver.com/place/1300845538/review/visitor' },
+  coupon: { amount: '50,000원', url: 'https://map.naver.com/p/entry/place/1300845538' },
+  links: {
+    naverMap: 'https://map.naver.com/p/entry/place/1300845538?c=15.00,0,0,0,dh&placePath=%2Finformation%3FfromPanelNum%3D1%26additionalHeight%3D76%26timestamp%3D202611102048%26locale%3Dko%26svcName%3Dmap_pcv5',
+    kakaoMap: 'https://place.map.kakao.com/1141364908',
+    talk: 'https://talk.naver.com/w4g2x1',
+    instagram: 'https://www.instagram.com/cheongju_kimsilzzang/',
+    blog: 'https://blog.naver.com/zkkh1004',
+    cafe: 'https://cafe.naver.com/f-e/cafes/14885399/menus/2154',
+    youtube: 'https://youtu.be/EyZBmT2XM-k'
+  }
 };
 
 export const PLACEHOLDER_RESERVATION = '#reservation';
 
 // [번호, 이름, 세부 항목, 설명, 아이콘 키]
 export const SERVICES = [
-  { id: 'wallpaper', num: '01', title: '도배', meta: ['실크', '합지', '부분도배'], desc: '벽면 상태와 채광을 먼저 보고, 오래 편안한 색을 고릅니다.', icon: 'roll' },
-  { id: 'floor', num: '02', title: '장판 · 마루', meta: ['장판', '강마루', '데코타일'], desc: '생활 방식과 예산에 맞춰 바닥의 질감과 내구도를 제안합니다.', icon: 'floor' },
-  { id: 'film', num: '03', title: '필름 · 목공', meta: ['문', '샤시', '가구', '몰딩'], desc: '보이는 면과 손이 닿는 면의 마감을 같은 기준으로 관리합니다.', icon: 'door' },
-  { id: 'bath', num: '04', title: '욕실 · 주방', meta: ['타일', '욕실', '싱크대'], desc: '매일 쓰는 공간일수록 동선과 관리 편의성을 함께 봅니다.', icon: 'tile' },
-  { id: 'partial', num: '05', title: '부분 리모델링', meta: ['누수', '도장', '수납'], desc: '필요한 곳만 정확하게. 공사 범위를 줄여도 결과는 선명하게.', icon: 'brush' },
-  { id: 'store', num: '06', title: '상가 인테리어', meta: ['학원', '사무실', '매장'], desc: '업종과 사용자를 고려해 공정과 마감 순서를 설계합니다.', icon: 'store' }
+  { id: 'wallpaper', num: '01', title: '도배', meta: ['실크', '합지', '부분도배', '우물천장 라운드'], desc: 'LX 디아망 · 실크베스트 등 벽면 상태와 채광에 맞는 벽지를 고르고, 오래 편안한 색을 제안합니다.', icon: 'roll' },
+  { id: 'floor', num: '02', title: '장판 · 마루', meta: ['LX · KCC 장판', '강마루', '지아마루', '부분장판'], desc: '동화 · 구정 · 한솔 마루부터 장판까지, 생활 방식과 예산에 맞춰 바닥재를 제안합니다.', icon: 'floor' },
+  { id: 'film', num: '03', title: '필름 · 목공', meta: ['인테리어 필름', '문', '샤시', '몰딩'], desc: '보이는 면과 손이 닿는 면의 마감을 같은 기준으로 관리합니다.', icon: 'door' },
+  { id: 'bath', num: '04', title: '욕실 · 주방', meta: ['씽크대', '타일', '욕실'], desc: '매일 쓰는 공간일수록 동선과 관리 편의성을 함께 봅니다.', icon: 'tile' },
+  { id: 'partial', num: '05', title: '부분 · 아파트 인테리어', meta: ['우물천장 조명', '누수', '도장', '수납'], desc: '작은 견적, 큰 견적 구분 없이. 필요한 곳만 정확하게 바꿉니다.', icon: 'brush' },
+  { id: 'store', num: '06', title: '상가 · 사무실 인테리어', meta: ['학원', '사무실', '매장'], desc: '업종과 사용자를 고려해 공정과 마감 순서를 설계합니다.', icon: 'store' }
 ];
 
 export const TICKER = ['도배', '장판', '마루', '데코타일', '필름', '목공', '욕실', '타일', '주방', '수납', '도장', '누수', '리모델링', '상가 인테리어'];
+
+// 취급 자재 브랜드 (네이버 플레이스 소개 기준)
+export const BRANDS = [
+  { group: '벽지', items: ['LX하우시스 (디아망 · 실크베스트)', '신한벽지', '개나리벽지', '합지'] },
+  { group: '마루', items: ['동화자연마루', '구정마루', '한솔마루', 'LX 에디톤마루', '지아마루 스타일'] },
+  { group: '장판', items: ['LX 장판', 'KCC 장판', '대진장판'] }
+];
+
+// 가격표 항목 (네이버 플레이스 가격표 · 모두 "변동")
+export const PRICE_ITEMS = [
+  'LX 디아망 벽지', 'LX 실크베스트 벽지', '부분도배', '우물 무몰딩 라운드 도배 추가', '우물 라운드 조명 작업',
+  'LX · KCC 장판', '부분장판', '동화자연마루 · 구정마루 · 한솔마루', '지아마루 스타일',
+  '인테리어 필름', '필름', '씽크대'
+];
 
 export const PILLARS = [
   { k: '01', title: '먼저 듣고, 직접 봅니다', body: '사진·평수·원하는 분위기를 듣고 방문해 벽면과 바닥 상태, 채광을 직접 확인합니다.' },
@@ -106,6 +133,8 @@ export const FAQ = [
   { q: '시공 기간은 얼마나 걸리나요?', a: '공간 크기, 시공 항목, 기존 마감 상태에 따라 달라집니다. 방문 후 공정별 일정을 정리해 미리 안내드립니다.' },
   { q: '짐이 있는 상태에서도 시공할 수 있나요?', a: '가능한 경우가 많습니다. 현장 확인 시 가구 이동과 보양 범위를 함께 협의합니다.' },
   { q: '부분 도배나 작은 수리도 맡길 수 있나요?', a: '네. 방 한 칸 도배, 누수 흔적 보수, 부분 장판 교체처럼 필요한 곳만 정확하게 시공합니다.' },
+  { q: '가격은 어떻게 정해지나요?', a: '벽지 · 바닥재 종류, 면적, 기존 마감 상태에 따라 달라집니다. 가격표의 모든 항목은 현장 확인 후 정확한 금액으로 안내드리며, 작은 견적과 큰 견적 구분 없이 똑같이 상담합니다.' },
+  { q: '할인 혜택이 있나요?', a: '네이버 플레이스에서 5만원 할인 쿠폰을 받으실 수 있습니다. 상담 시 쿠폰을 받았다고 말씀해 주세요.' },
   { q: '시공 후 문제가 생기면 어떻게 하나요?', a: '마감 확인 시 A/S 방법을 안내드리며, 대표 직통 번호로 바로 연락하실 수 있습니다.' }
 ];
 
